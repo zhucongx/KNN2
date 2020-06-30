@@ -10,6 +10,7 @@ using arma::vec;
  * this will only work for the on-lattice cases
  * because it has no buffer range when comparing
  */
+const double epsilon = 1e-12;
 inline void sortAtomLexi(vector<KNAtom>& atmList) {
   sort(
     atmList.begin(), atmList.end(),
@@ -18,10 +19,17 @@ inline void sortAtomLexi(vector<KNAtom>& atmList) {
       //          (a.pst[X] == b.pst[X] && a.pst[Y] < b.pst[Y]) ||
       //          (a.pst[X] == b.pst[X] && a.pst[Y] == b.pst[Y] &&
       //           a.pst[Z] < b.pst[Z]); }
-      { return (a.prl[X] < b.prl[X]) ||
-               (a.prl[X] == b.prl[X] && a.prl[Y] < b.prl[Y]) ||
-               (a.prl[X] == b.prl[X] && a.prl[Y] == b.prl[Y] &&
-                a.prl[Z] < b.prl[Z]); }
+    {
+      if (a.prl[X] < b.prl[X] - epsilon)
+        return true;
+      if (b.prl[X] < a.prl[X] - epsilon)
+        return false;
+      if (a.prl[Y] < b.prl[Y] - epsilon)
+        return true;
+      if (b.prl[Y] < a.prl[Y] - epsilon)
+        return false;
+      return a.prl[Z] < b.prl[Z] - epsilon;
+    }
     );
 }
 
